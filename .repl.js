@@ -13,4 +13,4 @@ global.Promise     = require('bluebird')
 global.Lazy        = require('lazy.js')
 global.sprintf     = require('sprintf')
 global.outdent     = require('outdent')
-
+global.dd          = require('./dist') // dexter-data
