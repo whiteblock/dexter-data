@@ -1,6 +1,11 @@
 {
   "dependencies": {
+    "bluebird": "^3.5.5",
     "ccxt": "^1.18.615",
+    "dotenv": "^8.0.0",
+    "lazy.js": "^0.5.1",
+    "outdent": "^0.7.0",
+    "sprintf": "^0.1.5",
     "tslint-config-airbnb": "^5.11.1"
   },
   "devDependencies": {
