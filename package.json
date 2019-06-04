@@ -4,5 +4,22 @@
   },
   "devDependencies": {
     "tslint": "^5.17.0"
-  }
+  },
+  "name": "dexter-data",
+  "version": "1.0.0",
+  "description": "A service for continuous market data collection",
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/Whiteblock/dexter-data.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Whiteblock/dexter-data/issues"
+  },
+  "homepage": "https://github.com/Whiteblock/dexter-data#readme"
 }
