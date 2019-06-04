@@ -1,5 +1,7 @@
 {
-  "dependencies": {},
+  "dependencies": {
+    "tslint-config-airbnb": "^5.11.1"
+  },
   "devDependencies": {
     "tslint": "^5.17.0"
   }
