@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "ccxt": "^1.18.615",
     "tslint-config-airbnb": "^5.11.1"
   },
   "devDependencies": {
