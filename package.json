@@ -1,0 +1,6 @@
+{
+  "dependencies": {},
+  "devDependencies": {
+    "tslint": "^5.17.0"
+  }
+}
