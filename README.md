@@ -4,7 +4,7 @@ A gRPC service for streaming market data.
 
 ## Install
 
-yarn add Whiteblock/dexter-data
+npm install Whiteblock/dexter-data
 
 ## Usage
 
