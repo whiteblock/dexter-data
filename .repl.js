@@ -15,4 +15,4 @@ global.sprintf     = require('sprintf')
 global.outdent     = require('outdent')
 global.ccxt        = require('ccxt')
 
-global.dd          = require('./dist') // dexter-data
+global.dd          = require('./dist').default // dexter-data
