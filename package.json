@@ -38,7 +38,9 @@
   "description": "A service for continuous market data collection",
   "main": "dist/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build-dist": "tsc || true",
+    "prepare": "npm run build-dist"
   },
   "repository": {
     "type": "git",
