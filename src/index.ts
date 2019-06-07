@@ -29,7 +29,8 @@ function supportedExchanges() {
 async function supportedMarkets(exchange: string) {
   const ex: any = new ccxt[exchange]();
   const markets = await ex.loadMarkets();
-  return markets;
+  const symbols = Object.keys(markets);
+  return symbols;
 }
 
 async function getCandles(exchange: string, market: string, timeframe: string) {
