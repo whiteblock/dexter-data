@@ -1,0 +1,39 @@
+message ExchangesRequest {
+}
+
+message ExchangesResponse {
+  repeated Exchange exchanges = 1;
+}
+
+message Exchange {
+  required string name = 1;
+}
+
+message MarketsRequest {
+  required string exchange = 1;
+}
+
+message MarketsResponse {
+  repeated Market markets = 1;
+}
+
+message Market {
+  required string name = 1;
+}
+
+message CandlesRequest {
+}
+
+message CandlesResponse {
+}
+
+message CandleStreamResponse {
+}
+
+service DexterData {
+  rpc SupportedExchanges (ExchangesRequest) returns (ExchangesResponse) {}
+  rpc SupportedMarkets (MarketsRequest) returns (MarketsResponse) {}
+  rpc GetCandles (CandlesRequest) returns (CandlesResponse) {}
+  rpc StreamCandles (CandlesRequest) returns (stream CandleStreamResponse) {}
+}
+

@@ -1,0 +1,7 @@
+#!/usr/bin/env node
+const grpc = require('grpc');
+const service = require('../dist/service');
+const server = service.getServer();
+const bind = process.env.BIND || '0.0.0:50051';
+server.bind(bind, grpc.ServerCredentials.createInsecure());
+server.start();
