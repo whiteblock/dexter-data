@@ -1354,6 +1354,11 @@ graceful-fs@^4.1.11, graceful-fs@^4.1.2:
   resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.1.15.tgz#ffb703e1066e8a0eeaa4c8b80ba9253eeefbfb00"
   integrity sha512-6uHUhOPEBgQ24HM+r6b/QwWfZq+yiFcipKFrOFiBEnWdy5sdzYoi+pJeQaPI5qOLRFqWmAXUPQNsielzdLoecA==
 
+grpc-boom@^1.0.22:
+  version "1.0.22"
+  resolved "https://registry.yarnpkg.com/grpc-boom/-/grpc-boom-1.0.22.tgz#b7475143c3eaef6319e9a46576b1bc7a3b3f8cbb"
+  integrity sha512-lDZ7WKof8tJv2QjqWF52M3xUrsnHxhfg22DZnBgs278QHfD5FoLC7RshKPUqGqr4etro3msD4BIOqT0upn+dXA==
+
 grpc@^1.21.1:
   version "1.21.1"
   resolved "https://registry.yarnpkg.com/grpc/-/grpc-1.21.1.tgz#541c0f4bccffcf6aef200536179594633d4579cf"

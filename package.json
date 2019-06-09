@@ -12,6 +12,7 @@
     "ethereumjs-abi": "^0.6.7",
     "ethereumjs-util": "^6.1.0",
     "grpc": "^1.21.1",
+    "grpc-boom": "^1.0.22",
     "influx": "^5.1.0",
     "knex": "^0.17.3",
     "lazy.js": "^0.5.1",
