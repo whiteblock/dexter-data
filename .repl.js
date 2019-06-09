@@ -16,3 +16,4 @@ global.outdent     = require('outdent')
 global.ccxt        = require('ccxt')
 
 global.dd          = require('./dist').default // dexter-data
+global.service     = require('./dist/service').default

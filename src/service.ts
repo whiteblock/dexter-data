@@ -1,6 +1,7 @@
 import grpc from 'grpc';
 import * as protoLoader from '@grpc/proto-loader';
 import dexterData from './index';
+import GrpcBoom from 'grpc-boom';
 
 const PROTO_PATH = `${__dirname}/../proto/dexter-data.proto`;
 const packageDefinition = protoLoader.loadSync(
@@ -16,7 +17,8 @@ const packageDefinition = protoLoader.loadSync(
 );
 const protoDescriptor = grpc.loadPackageDefinition(packageDefinition);
 
-function unsupported() {
+function unsupported(call: any, cb: any) {
+  cb(GrpcBoom.unimplemented("This method has not been implemented yet"))
 }
 
 function supportedExchanges(call: any, cb: any) {
@@ -57,7 +59,8 @@ function getClient(bind: string) {
   return new protoDescriptor.DexterData(bind, grpc.credentials.createInsecure());
 }
 
-module.exports = {
+export default {
+  GrpcBoom,
   packageDefinition,
   protoDescriptor,
   unsupported,
