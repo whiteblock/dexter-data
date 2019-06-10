@@ -1,7 +1,10 @@
-import ccxt from 'ccxt';
+import _ccxt from 'ccxt';
 import Bookshelf from 'bookshelf';
 import Knex from 'knex';
 import Lazy from 'lazy.js';
+import events, { EventEmitter } from 'events';
+
+const ccxt: any = _ccxt; // a hack to make TypeScript shut up.
 
 /*
 
@@ -17,6 +20,63 @@ import Lazy from 'lazy.js';
   - Wrap all this in a gRPC service.
 
  */
+
+interface PriceEmitterOptions { // or CandleEmitter
+  exchange:        string;
+  market:          string;
+  updateInterval?: number;
+}
+
+
+class PriceEmitter {
+  intervalId:     NodeJS.Timeout | undefined;
+  updateInterval: number;
+  em:             EventEmitter;
+  ex:             any;
+  exchange:       string;
+  market:         string;
+  subscribers:    Array<EventEmitter>;
+
+  constructor(opts: PriceEmitterOptions) {
+    this.updateInterval = opts.updateInterval || 10000;
+    this.ex = new ccxt[opts.exchange]();
+    this.exchange = opts.exchange;
+    this.market = opts.market;
+    const em = this.em = new EventEmitter();
+    this.subscribers = [];
+    em.on('price', (candles) => {
+      // loop through every subscriber and send them the last 2 1m candles
+      this.subscribers.forEach((sub) => {
+        sub.emit('price', candles)
+      })
+    });
+  }
+
+  start() {
+    this.intervalId = setInterval(async () => {
+      try {
+        const candles = await this.ex.fetchOHLCV(this.market, '1m', undefined, 2);
+        if (candles[1]) {
+          this.em.emit('price', candles);
+        }
+      }
+      catch (e) {
+        console.warn(e);
+      }
+    }, this.updateInterval);
+  }
+
+  stop() {
+    if (this.intervalId) {
+      clearInterval(this.intervalId);
+      this.intervalId = undefined
+    }
+  }
+
+  addSubscriber(subscriber: EventEmitter) {
+    this.subscribers.push(subscriber)
+  }
+}
 
 function supportedExchanges() {
   return Lazy(ccxt.exchanges)
@@ -39,6 +99,11 @@ async function getCandles(exchange: string, market: string, timeframe: string) {
   return candles
 }
 
+function createPriceEmitter(exchange: string, market: string, updateInterval: number = 10000): PriceEmitter {
+  const em = new PriceEmitter({ exchange, market, updateInterval });
+  return em;
+}
+
 async function streamCandles(exchange: string, market: string, timeframe: string) {
 }
 
@@ -53,6 +118,7 @@ export default {
   supportedExchanges,
   supportedMarkets,
   getCandles,
+  createPriceEmitter,
   streamCandles,
   archiveMarket,
 };
