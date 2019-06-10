@@ -33,6 +33,11 @@
   dependencies:
     regenerator-runtime "^0.13.2"
 
+"@channel/channel@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@channel/channel/-/channel-1.0.0.tgz#f6962d568b0da222690610a30ab745a7991e7cd7"
+  integrity sha512-FlKrECaN/2ZMTQvWc8vmRTZ2yJAPpE6TpPYep20dQfPtYAAPgI/PkfsKfEEWSzAJZLshuUlMWPQbCfEhsXfnSg==
+
 "@fimbul/bifrost@^0.17.0":
   version "0.17.0"
   resolved "https://registry.yarnpkg.com/@fimbul/bifrost/-/bifrost-0.17.0.tgz#f0383ba7e40992e3193dc87e2ddfde2ad62a9cf4"
