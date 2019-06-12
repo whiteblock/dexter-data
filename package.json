@@ -17,6 +17,7 @@
     "influx": "^5.1.0",
     "knex": "^0.17.3",
     "lazy.js": "^0.5.1",
+    "luxon": "^1.16.0",
     "outdent": "^0.7.0",
     "pg": "^7.11.0",
     "sprintf": "^0.1.5",
@@ -24,6 +25,7 @@
     "web3": "^1.0.0-beta.55"
   },
   "devDependencies": {
+    "@types/luxon": "^1.15.1",
     "@types/node": "^12.0.7",
     "@types/protobufjs": "^6.0.0",
     "nodemon": "^1.19.1",
