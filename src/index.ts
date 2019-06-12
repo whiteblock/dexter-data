@@ -111,7 +111,24 @@ class CandleEmitter {
    * @returns           An updated candle
    */
   updateCandle(lastCandle: Array<number>, candle: Array<number>): Array<number> {
-    return [];
+    // 0 timestamp
+    // 1 open
+    // 2 high
+    // 3 low
+    // 4 close
+    // 5 volume
+    const close = candle[4];
+    const newCandle = [...lastCandle];
+    console.log({ lastCandle, candle, close });
+    if (newCandle[2] < close) {
+      newCandle[2] = close
+    }
+    if (newCandle[3] > close) {
+      newCandle[3] = close
+    }
+    newCandle[4] = close;
+    //newCandle[5] = ? // TODO - Learn how volume is calculated so I can aggregate it myself.
+    return newCandle;
   }
 
   emitCandles(candles: Array<Array<number>>) {
@@ -128,12 +145,6 @@ class CandleEmitter {
       return
     } else if (candles.length === 2) {
       // typical case
-      // 0 timestamp
-      // 1 open
-      // 2 high
-      // 3 low
-      // 4 close
-      // 5 volume
       const c0 = candles[0];
       const c1 = candles[1];
       const c1ts = time.dt(c1[0]);
@@ -216,6 +227,7 @@ async function streamCandles(exchange: string, market: string, timeframe: string
   // TODO need to initialize it with the current candle.
   const candleEmitter = new CandleEmitter({ timeframe, closeOnly: false })
   priceEm.addSubscriber(candleEmitter.input);
+  priceEm.start();
   return candleEmitter;
 }
 
@@ -225,7 +237,7 @@ function archiveMarket(exchange: string, market: string, timeframe: string) {
 export default {
   //Bookshelf,
   //Knex,
-  ccxt,
+  //ccxt,
   //Lazy,
   PriceEmitter,
   CandleEmitter,
