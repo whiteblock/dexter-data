@@ -92,6 +92,7 @@ class CandleEmitter {
   output: EventEmitter
   timeframe: string
   closeOnly: boolean
+  priceHandler: any // TODO - replace with a function type
 
   constructor(opts: CandleEmitterOptions) {
     this.lastCandle = []
@@ -99,9 +100,22 @@ class CandleEmitter {
     this.closeOnly = opts.closeOnly
     this.output = new EventEmitter()
     this.input = new EventEmitter()
+    this.priceHandler = this.emitCandles.bind(this)
+  }
 
+  /**
+   * Start emitting candles.
+   */
+  start() {
     // generate candles as new price data comes in
-    this.input.on('price', this.emitCandles.bind(this))
+    this.input.on('price', this.priceHandler)
+  }
+
+  /**
+   * Stop emitting candles.
+   */
+  stop() {
+    this.input.off('price', this.priceHandler);
   }
 
   /**
@@ -120,6 +134,11 @@ class CandleEmitter {
     const close = candle[4];
     const newCandle = [...lastCandle];
     console.log({ lastCandle, candle, close });
+    if (lastCandle.length === 0) {
+      newCandle[1] = newCandle[2] = newCandle[3] = newCandle[4] = close;
+      newCandle[0] = time.timestampForInterval(this.timeframe, candle[0]);
+      return newCandle;
+    }
     if (newCandle[2] < close) {
       newCandle[2] = close
     }
@@ -131,6 +150,10 @@ class CandleEmitter {
     return newCandle;
   }
 
+  /**
+   * This takes 'price' messages emitted from a PriceEmitter and creates updated candles.
+   * @param candles pair of candles from an exchange
+   */
   emitCandles(candles: Array<Array<number>>) {
     // the reason I'm sending the last 2 candles is because when a new candle opens, I don't want to miss
     // the last bit of data
@@ -231,7 +254,14 @@ async function streamCandles(exchange: string, market: string, timeframe: string
   return candleEmitter;
 }
 
+/**
+ * Start saving candlesticks to a database.
+ * @param exchange An exchange name for ccxt
+ * @param market A market in `exchange` 
+ * @param timeframe The duration of a candlestick
+ */
 function archiveMarket(exchange: string, market: string, timeframe: string) {
+  // TODO - Implement this method.
 }
 
 export default {

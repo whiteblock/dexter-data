@@ -37,6 +37,23 @@ async function getCandles(call: any, cb: any) {
   cb(null, { candles: candles.map((c:any) => { return { timestamp: c[0], o: c[1], h: c[2], l: c[3], c: c[4], v: c[5] }}) })
 }
 
+async function streamCandles(call: any) {
+  const {exchange, market, timeframe} = call.request;
+  const candleEmitter = await dexterData.streamCandles(exchange, market, timeframe);
+  candleEmitter.output.on('candle', (candle) => {
+    const c = {
+      timestamp: candle[0],
+      o: candle[1],
+      h: candle[2],
+      l: candle[3],
+      c: candle[4],
+      v: candle[5],
+    }
+    call.write(c);
+  })
+  candleEmitter.start()
+}
+
 function test(call: any, cb: any) {
   cb(null, { a: 1, b: 2 });
 }
@@ -49,8 +66,8 @@ function getServer() {
     supportedExchanges,
     supportedMarkets,
     getCandles,
-    streamCandles: unsupported,
-    test:          test,
+    streamCandles,
+    test,
   });
   return server;
 }
