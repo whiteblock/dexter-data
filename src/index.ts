@@ -1,8 +1,10 @@
 import _ccxt from 'ccxt';
-import Bookshelf from 'bookshelf';
-import Knex from 'knex';
+//import Bookshelf from 'bookshelf';
+//import Knex from 'knex';
 import Lazy from 'lazy.js';
-import events, { EventEmitter } from 'events';
+import { EventEmitter } from 'events';
+
+import time from './time';
 
 const ccxt: any = _ccxt; // a hack to make TypeScript shut up.
 
@@ -21,12 +23,12 @@ const ccxt: any = _ccxt; // a hack to make TypeScript shut up.
 
  */
 
+
 interface PriceEmitterOptions { // or CandleEmitter
   exchange:        string;
   market:          string;
   updateInterval?: number;
 }
-
 
 class PriceEmitter {
   intervalId:     NodeJS.Timeout | undefined;
@@ -53,6 +55,7 @@ class PriceEmitter {
   }
 
   start() {
+    if (this.intervalId) return;
     this.intervalId = setInterval(async () => {
       try {
         const candles = await this.ex.fetchOHLCV(this.market, '1m', undefined, 2);
@@ -78,7 +81,83 @@ class PriceEmitter {
   }
 }
 
-function supportedExchanges() {
+interface CandleEmitterOptions {
+  timeframe: string
+  closeOnly: boolean
+}
+
+class CandleEmitter {
+  lastCandle: Array<number>
+  input: EventEmitter
+  output: EventEmitter
+  timeframe: string
+  closeOnly: boolean
+
+  constructor(opts: CandleEmitterOptions) {
+    this.lastCandle = []
+    this.timeframe = opts.timeframe
+    this.closeOnly = opts.closeOnly
+    this.output = new EventEmitter()
+    this.input = new EventEmitter()
+
+    // generate candles as new price data comes in
+    this.input.on('price', this.emitCandles.bind(this))
+  }
+
+  /**
+   * Compare the `lastCandle` with the current `candle` and return an updated candle in the same timeframe.
+   * @param lastCandle  Previous candle data
+   * @param candle      The most recent candle data
+   * @returns           An updated candle
+   */
+  updateCandle(lastCandle: Array<number>, candle: Array<number>): Array<number> {
+    return [];
+  }
+
+  emitCandles(candles: Array<Array<number>>) {
+    // the reason I'm sending the last 2 candles is because when a new candle opens, I don't want to miss
+    // the last bit of data
+    if (candles.length === 0) {
+      // no data
+      return
+    } else if (candles.length === 1) {
+      // only one candle available.  brand new market?
+      this.lastCandle = candles[0]
+      this.lastCandle[0] = time.timestampForInterval(this.timeframe, candles[0][0]);
+      this.output.emit('candle', this.lastCandle);
+      return
+    } else if (candles.length === 2) {
+      // typical case
+      // 0 timestamp
+      // 1 open
+      // 2 high
+      // 3 low
+      // 4 close
+      // 5 volume
+      const c0 = candles[0];
+      const c1 = candles[1];
+      const c1ts = time.dt(c1[0]);
+      if (time.isIntervalBoundary(this.timeframe, c1ts)) {
+        if (this.lastCandle[4] != c0[4]) {
+          const finishCandle = this.updateCandle(this.lastCandle, c0);
+          this.output.emit('candle', finishCandle);
+          this.lastCandle = c1;
+          this.output.emit('candle', this.lastCandle);
+        }
+        this.lastCandle = c1;
+      } else {
+        this.lastCandle = this.updateCandle(this.lastCandle, c1);
+        this.output.emit('candle', this.lastCandle);
+      }
+    }
+  }
+}
+
+/**
+ * Return a list of exchanges we can pull market data from.
+ * @returns A list of exchanges we support.
+ */
+function supportedExchanges(): Array<string> {
   return Lazy(ccxt.exchanges)
     .map((name: string) => new ccxt[name]())
     .filter((ex: any) => ex.has['fetchOHLCV'])
@@ -86,39 +165,74 @@ function supportedExchanges() {
     .toArray()
 }
 
-async function supportedMarkets(exchange: string) {
+/**
+ * Return a list of markets available on an exchange.
+ * @param exchange An exchange name
+ * @returns a list of markets
+ */
+async function supportedMarkets(exchange: string): Promise<Array<string>> {
   const ex: any = new ccxt[exchange]();
   const markets = await ex.loadMarkets();
   const symbols = Object.keys(markets);
   return symbols;
 }
 
+/**
+ * Return a list of candlesticks for a given market.
+ * @param exchange An exchange name
+ * @param market A market
+ * @param timeframe The duration of a candlestick
+ */
 async function getCandles(exchange: string, market: string, timeframe: string) {
   const ex: any = new ccxt[exchange]();
   const candles: Array<Object> = await ex.fetchOHLCV(market, timeframe);
   return candles
 }
 
-function createPriceEmitter(exchange: string, market: string, updateInterval: number = 10000): PriceEmitter {
-  const em = new PriceEmitter({ exchange, market, updateInterval });
-  return em;
+// PriceEmitter -[1m candles every interval]-> CandleAggregator -[new candle for given timeframe]-> 
+
+const emitters: {[key:string]: PriceEmitter} = {};
+
+/**
+ * Return a `PriceEmitter` for the given `exchange` and `market`, constructing a new one if necessary.
+ * @param exchange An exchange name for ccxt
+ * @param market   A market in `exchange`
+ * @param updateInterval Milliseconds between price fetches
+ * @returns A `PriceEmitter` instance
+ */
+function getPriceEmitter(exchange: string, market: string, updateInterval: number = 10000): PriceEmitter {
+  const key = `${exchange}|${market}`;
+  if (emitters[key]) {
+    return emitters[key];
+  } else {
+    const em = new PriceEmitter({ exchange, market, updateInterval });
+    emitters[key] = em;
+    return em;
+  }
 }
 
 async function streamCandles(exchange: string, market: string, timeframe: string) {
+  const priceEm = getPriceEmitter(exchange, market);
+  // TODO need to initialize it with the current candle.
+  const candleEmitter = new CandleEmitter({ timeframe, closeOnly: false })
+  priceEm.addSubscriber(candleEmitter.input);
+  return candleEmitter;
 }
 
 function archiveMarket(exchange: string, market: string, timeframe: string) {
 }
 
 export default {
-  Bookshelf,
-  Knex,
+  //Bookshelf,
+  //Knex,
   ccxt,
-  Lazy,
+  //Lazy,
+  PriceEmitter,
+  CandleEmitter,
   supportedExchanges,
   supportedMarkets,
   getCandles,
-  createPriceEmitter,
+  getPriceEmitter,
   streamCandles,
   archiveMarket,
 };

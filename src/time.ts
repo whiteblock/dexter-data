@@ -5,9 +5,11 @@ function dt(ms: number): DateTime {
 }
 
 /**
- * given interval is the time at a boundary
- * @param {Interval} interval - InfluxDB duration notation, eg. 1m, 5m, 1d
- * @param {DateTime} time - A time
+ * Return true if the given `time` is on an interval boundary.
+ *
+ * @param interval  InfluxDB duration notation, eg. 1m, 5m, 1d
+ * @param time      A time
+ * @returns         `true` if the timestamp is on an interval boundary.`
  */
 function isIntervalBoundary(
   interval: string,
@@ -38,6 +40,11 @@ function isIntervalBoundary(
   return false;
 }
 
+/**
+ * Convert an interval into milliseconds.
+ * @param   interval  A duration in InfluxDB notation
+ * @returns           The duration of the interval in milliseconds
+ */
 function intervalToMilliseconds(interval: string): number {
   const match  = interval.match(/(\d+)(\w+)/);
   if (!match) {
@@ -61,12 +68,15 @@ function intervalToMilliseconds(interval: string): number {
 }
 
 /**
- *
+ * Given an interval and a timestamp, adjust the timestamp so that it fits inside the interval.
+ * @param interval A duration in InfluxDB notation
+ * @param ms       A timestamp in milliseconds
+ * @returns        An adjusted timestamp in milliseconds that fits inside `interval`
  */
-function timestampForInterval(interval: string, seconds: number): number {
+function timestampForInterval(interval: string, ms: number): number {
   const ints = intervalToMilliseconds(interval);
-  const diff = seconds % ints;
-  return seconds - diff;
+  const diff = ms % ints;
+  return ms - diff;
 }
 
 export default {
