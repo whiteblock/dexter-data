@@ -1,5 +1,10 @@
 import { DateTime, Interval } from 'luxon';
 
+/**
+ * Create a DateTime instance from milliseconds.
+ * @param ms A timestamp in milliseconds
+ * @returns A DateTime instance
+ */
 function dt(ms: number): DateTime {
   return DateTime.fromMillis(ms, { zone: 'UTC' });
 }
