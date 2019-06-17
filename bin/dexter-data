@@ -1,7 +1,15 @@
 #!/usr/bin/env node
+const program = require('commander');
+const pkg = require('../package');
 const grpc = require('grpc');
 const service = require('../dist/service').default;
 const server = service.getServer();
-const bind = process.env.BIND || '0.0.0.0:50051';
-server.bind(bind, grpc.ServerCredentials.createInsecure());
+
+program
+  .version(pkg.version)
+  .option('-b, --bind <address>', 'Address to bind to', '0.0.0.0:50051')
+  .option('-v, --verbose', 'Be verbose')
+  .parse(process.argv)
+
+server.bind(program.bind, grpc.ServerCredentials.createInsecure());
 server.start();
