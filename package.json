@@ -2,9 +2,6 @@
   "dependencies": {
     "@channel/channel": "^1.0.0",
     "@grpc/proto-loader": "^0.5.1",
-    "@types/bookshelf": "^0.13.2",
-    "@types/dotenv": "^6.1.1",
-    "@types/knex": "^0.16.1",
     "bignumber.js": "^9.0.0",
     "bluebird": "^3.5.5",
     "bookshelf": "^0.14.2",
@@ -20,13 +17,18 @@
     "luxon": "^1.16.0",
     "outdent": "^0.7.0",
     "pg": "^7.11.0",
+    "pino": "^5.12.6",
     "sprintf": "^0.1.5",
     "tslint-config-airbnb": "^5.11.1",
     "web3": "^1.0.0-beta.55"
   },
   "devDependencies": {
+    "@types/bookshelf": "^0.13.2",
+    "@types/dotenv": "^6.1.1",
+    "@types/knex": "^0.16.1",
     "@types/luxon": "^1.15.1",
     "@types/node": "^12.0.7",
+    "@types/pino": "^5.8.8",
     "@types/protobufjs": "^6.0.0",
     "nodemon": "^1.19.1",
     "ts-node": "^8.2.0",
