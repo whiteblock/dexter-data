@@ -39,14 +39,14 @@ async function supportedMarkets(call: any, cb: any) {
 
 async function getCandles(call: any, cb: any) {
   const {exchange, market, timeframe} = call.request;
-  logger.info({ method: 'GetCandles', exchange, market, timeframe })
+  logger.info({ method: 'GetCandles', exchange, market, timeframe });
   const candles = await dexterData.getCandles(exchange, market, timeframe);
   cb(null, { candles: candles.map((c:any) => { return { timestamp: c[0], o: c[1], h: c[2], l: c[3], c: c[4], v: c[5] }}) })
 }
 
 async function streamCandles(call: any) {
   const {exchange, market, timeframe} = call.request;
-  logger.info({ method: 'StreamCandles', exchange, market, timeframe })
+  logger.info({ method: 'StreamCandles', exchange, market, timeframe });
   const candleEmitter = await dexterData.streamCandles(exchange, market, timeframe);
   candleEmitter.output.on('candle', (candle) => {
     const c = {
@@ -59,10 +59,11 @@ async function streamCandles(call: any) {
     }
     call.write(c);
   })
-  call.on('end', () => {
-    candleEmitter.stop()
+  call.on('cancelled', () => {
+    logger.info({ method: 'StreamCandles', cancelled: true, exchange, market, timeframe })
+    candleEmitter.stop();
   })
-  candleEmitter.start()
+  candleEmitter.start();
 }
 
 function test(call: any, cb: any) {
