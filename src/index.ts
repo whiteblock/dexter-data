@@ -3,9 +3,10 @@ import _ccxt from 'ccxt';
 //import Knex from 'knex';
 import Lazy from 'lazy.js';
 import { EventEmitter } from 'events';
-
+import pino from 'pino';
 import time from './time';
 
+const logger = pino();
 const ccxt: any = _ccxt; // a hack to make TypeScript shut up.
 
 /*
@@ -79,6 +80,10 @@ class PriceEmitter {
   addSubscriber(subscriber: EventEmitter) {
     this.subscribers.push(subscriber)
   }
+
+  // TODO
+  removeSubscriber(subscriber: EventEmitter) {
+  }
 }
 
 interface CandleEmitterOptions {
@@ -133,7 +138,6 @@ class CandleEmitter {
     // 5 volume
     const close = candle[4];
     const newCandle = [...lastCandle];
-    console.log({ lastCandle, candle, close });
     if (lastCandle.length === 0) {
       newCandle[1] = newCandle[2] = newCandle[3] = newCandle[4] = close;
       newCandle[0] = time.timestampForInterval(this.timeframe, candle[0]);
@@ -176,11 +180,13 @@ class CandleEmitter {
           const finishCandle = this.updateCandle(this.lastCandle, c0);
           this.output.emit('candle', finishCandle);
           this.lastCandle = c1;
+          logger.info({ method: 'emitCandles', candle: this.lastCandle })
           this.output.emit('candle', this.lastCandle);
         }
         this.lastCandle = c1;
       } else {
         this.lastCandle = this.updateCandle(this.lastCandle, c1);
+        logger.info({ method: 'emitCandles', candle: this.lastCandle })
         this.output.emit('candle', this.lastCandle);
       }
     }
