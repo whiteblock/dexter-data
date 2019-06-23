@@ -19,7 +19,9 @@ steps:
         ]
 # push docker image tag(s) one branch, one immutable
 - name: 'gcr.io/cloud-builders/docker'
+  args: [ 'push', '$_IMAGE:latest' ]
+- name: 'gcr.io/cloud-builders/docker'
   args: [ 'push', '$_IMAGE:$COMMIT_SHA' ]
 - name: 'gcr.io/cloud-builders/docker'
   args: [ 'push', '$_IMAGE:$BRANCH_NAME' ]
-images: [ '$_IMAGE:$COMMIT_SHA', '$_IMAGE:$BRANCH_NAME' ]
+images: [ '$_IMAGE:latest', '$_IMAGE:$COMMIT_SHA', '$_IMAGE:$BRANCH_NAME' ]
