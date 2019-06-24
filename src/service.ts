@@ -6,7 +6,7 @@ import pino from 'pino';
 
 const logger = pino();
 
-const PROTO_PATH = `${__dirname}/../proto/dexter-data.proto`;
+const PROTO_PATH = `${__dirname}/../proto/data.proto`;
 const packageDefinition = protoLoader.loadSync(
   PROTO_PATH,
   {
@@ -68,7 +68,7 @@ async function streamCandles(call: any) {
 
 function getServer() {
   const server = new grpc.Server();
-  const dd: any = protoDescriptor.DexterData;
+  const dd: any = protoDescriptor.dexter.Data;
   const service = dd.service;
   server.addService(service, {
     supportedExchanges,
@@ -80,7 +80,7 @@ function getServer() {
 }
 
 function getClient(bind: string) {
-  return new protoDescriptor.DexterData(bind, grpc.credentials.createInsecure());
+  return new protoDescriptor.dexter.Data(bind, grpc.credentials.createInsecure());
 }
 
 export default {
