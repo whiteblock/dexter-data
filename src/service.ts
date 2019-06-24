@@ -66,10 +66,6 @@ async function streamCandles(call: any) {
   candleEmitter.start();
 }
 
-function test(call: any, cb: any) {
-  cb(null, { a: 1, b: 2 });
-}
-
 function getServer() {
   const server = new grpc.Server();
   const dd: any = protoDescriptor.DexterData;
@@ -79,7 +75,6 @@ function getServer() {
     supportedMarkets,
     getCandles,
     streamCandles,
-    test,
   });
   return server;
 }
@@ -89,7 +84,6 @@ function getClient(bind: string) {
 }
 
 export default {
-  GrpcBoom,
   packageDefinition,
   protoDescriptor,
   unsupported,
