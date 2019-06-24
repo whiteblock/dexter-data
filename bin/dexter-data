@@ -1,8 +1,8 @@
 #!/usr/bin/env node
-const program = require('commander');
-const pkg = require('../package');
-const grpc = require('grpc');
-const service = require('../dist/service').default;
+const program = require('commander')
+const pkg = require('../package')
+const grpc = require('grpc')
+const service = require('../dist/service').default
 
 program
   .version(pkg.version)
@@ -10,4 +10,4 @@ program
   .option('-v, --verbose', 'Be verbose')
   .parse(process.argv)
 
-service.startServer(program.bind);
+service.startServer(program.bind)
