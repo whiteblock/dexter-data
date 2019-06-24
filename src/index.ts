@@ -251,6 +251,13 @@ function getPriceEmitter(exchange: string, market: string, updateInterval: numbe
   }
 }
 
+/**
+ * Return a `CandleEmitter` for the given `exchange`, `market`, and `timeframe`
+ * @param exchange An exchange name for ccxt
+ * @param market A market in `exchange`
+ * @param timeframe The duration of a candlestick
+ * @returns A `CandleEmitter` instance
+ */
 async function streamCandles(exchange: string, market: string, timeframe: string) {
   const priceEm = getPriceEmitter(exchange, market);
   // TODO need to initialize it with the current candle.
