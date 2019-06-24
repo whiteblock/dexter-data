@@ -3,7 +3,6 @@ const program = require('commander');
 const pkg = require('../package');
 const grpc = require('grpc');
 const service = require('../dist/service').default;
-const server = service.getServer();
 
 program
   .version(pkg.version)
@@ -11,5 +10,4 @@ program
   .option('-v, --verbose', 'Be verbose')
   .parse(process.argv)
 
-server.bind(program.bind, grpc.ServerCredentials.createInsecure());
-server.start();
+service.startServer(program.bind);

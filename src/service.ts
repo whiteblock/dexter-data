@@ -79,6 +79,14 @@ function getServer() {
   return server;
 }
 
+function startServer(bind: string) {
+  logger.info({ method: 'StartServer', bind })
+  const server = getServer();
+  server.bind(bind, grpc.ServerCredentials.createInsecure());
+  server.start();
+
+}
+
 function getClient(bind: string) {
   return new protoDescriptor.dexter.Data(bind, grpc.credentials.createInsecure());
 }
@@ -88,5 +96,6 @@ export default {
   protoDescriptor,
   unsupported,
   getServer,
+  startServer,
   getClient,
 };
