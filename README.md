@@ -14,3 +14,4 @@ Run the gRPC server
 export BIND=0.0.0.0:50051
 dexter-data
 ```
+.
