@@ -22,4 +22,5 @@ global.EventEmitter = events.EventEmitter
 
 global.dd          = require('./dist').default // dexter-data
 global.service     = require('./dist/service').default
+global.alerts      = require('./dist/alerts').default
 global.time        = require('./dist/time').default
