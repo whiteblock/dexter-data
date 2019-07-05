@@ -87,6 +87,8 @@ class PriceEmitter {
 }
 
 interface CandleEmitterOptions {
+  exchange: string
+  market: string
   timeframe: string
   closeOnly: boolean
 }
@@ -95,14 +97,20 @@ class CandleEmitter {
   lastCandle: Array<number>
   input: EventEmitter
   output: EventEmitter
+  exchange: string
+  market: string
   timeframe: string
   closeOnly: boolean
+  ex: any
   priceHandler: any // TODO - replace with a function type
 
   constructor(opts: CandleEmitterOptions) {
     this.lastCandle = []
+    this.exchange = opts.exchange
+    this.market = opts.market
     this.timeframe = opts.timeframe
     this.closeOnly = opts.closeOnly
+    this.ex = new ccxt[opts.exchange]();
     this.output = new EventEmitter()
     this.input = new EventEmitter()
     this.priceHandler = this.emitCandles.bind(this)
@@ -111,7 +119,10 @@ class CandleEmitter {
   /**
    * Start emitting candles.
    */
-  start() {
+  async start() {
+    // initialize this.lastCandle with timeframe-appropriate data
+    const candles = await this.ex.fetchOHLCV(this.market, this.timeframe, undefined, 2)
+    this.lastCandle = candles[0]
     // generate candles as new price data comes in
     this.input.on('price', this.priceHandler)
   }
@@ -223,18 +234,19 @@ async function supportedMarkets(exchange: string): Promise<Array<string>> {
  * @param market A market
  * @param timeframe The duration of a candlestick
  * @param since A point in time in the past in ISO-8601 format.
- * @param limit The number of candles to fetch.  Note that `since` is required for `limit` to be honored.
+ * @param limit The number greater than 0 of the number of candles to fetch.
  */
 async function getCandles(exchange: string, market: string, timeframe: string, since: string, limit: number) {
   const ex: any = new ccxt[exchange]();
   const args: Array<any> = [ market, timeframe ];
   if (since) {
     args.push(ex.parse8601(since))
-    if (limit) {
-      args.push(limit)
-    }
+  } else {
+    args.push(undefined)
   }
-  console.log('args', args)
+  if (limit > 0) {
+    args.push(Number(limit))
+  }
   const candles: Array<Object> = await ex.fetchOHLCV(...args);
   return candles
 }
@@ -271,7 +283,7 @@ function getPriceEmitter(exchange: string, market: string, updateInterval: numbe
 async function streamCandles(exchange: string, market: string, timeframe: string) {
   const priceEm = getPriceEmitter(exchange, market);
   // TODO need to initialize it with the current candle.
-  const candleEmitter = new CandleEmitter({ timeframe, closeOnly: false })
+  const candleEmitter = new CandleEmitter({ exchange, market, timeframe, closeOnly: false })
   priceEm.addSubscriber(candleEmitter.input);
   priceEm.start();
   return candleEmitter;
