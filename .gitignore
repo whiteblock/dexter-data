@@ -62,3 +62,6 @@ typings/
 
 # typescript build
 dist/
+
+# tern
+.tern-port
