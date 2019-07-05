@@ -38,9 +38,9 @@ async function supportedMarkets(call: any, cb: any) {
 }
 
 async function getCandles(call: any, cb: any) {
-  const {exchange, market, timeframe} = call.request;
-  logger.info({ method: 'GetCandles', exchange, market, timeframe });
-  const candles = await dexterData.getCandles(exchange, market, timeframe);
+  const {exchange, market, timeframe, since, limit} = call.request;
+  logger.info({ method: 'GetCandles', exchange, market, timeframe, since, limit });
+  const candles = await dexterData.getCandles(exchange, market, timeframe, since, limit);
   cb(null, { candles: candles.map((c:any) => { return { timestamp: c[0], o: c[1], h: c[2], l: c[3], c: c[4], v: c[5] }}) })
 }
 

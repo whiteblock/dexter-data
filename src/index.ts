@@ -222,10 +222,20 @@ async function supportedMarkets(exchange: string): Promise<Array<string>> {
  * @param exchange An exchange name
  * @param market A market
  * @param timeframe The duration of a candlestick
+ * @param since A point in time in the past in ISO-8601 format.
+ * @param limit The number of candles to fetch.  Note that `since` is required for `limit` to be honored.
  */
-async function getCandles(exchange: string, market: string, timeframe: string) {
+async function getCandles(exchange: string, market: string, timeframe: string, since: string, limit: number) {
   const ex: any = new ccxt[exchange]();
-  const candles: Array<Object> = await ex.fetchOHLCV(market, timeframe);
+  const args: Array<any> = [ market, timeframe ];
+  if (since) {
+    args.push(ex.parse8601(since))
+    if (limit) {
+      args.push(limit)
+    }
+  }
+  console.log('args', args)
+  const candles: Array<Object> = await ex.fetchOHLCV(...args);
   return candles
 }
 
