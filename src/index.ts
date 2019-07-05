@@ -102,6 +102,7 @@ class CandleEmitter {
   timeframe: string
   closeOnly: boolean
   ex: any
+  volumeAccumulator: number // TODO - keep track of volume
   priceHandler: any // TODO - replace with a function type
 
   constructor(opts: CandleEmitterOptions) {
@@ -110,7 +111,8 @@ class CandleEmitter {
     this.market = opts.market
     this.timeframe = opts.timeframe
     this.closeOnly = opts.closeOnly
-    this.ex = new ccxt[opts.exchange]();
+    this.ex = new ccxt[opts.exchange]()
+    this.volumeAccumulator = 0
     this.output = new EventEmitter()
     this.input = new EventEmitter()
     this.priceHandler = this.emitCandles.bind(this)
@@ -123,6 +125,7 @@ class CandleEmitter {
     // initialize this.lastCandle with timeframe-appropriate data
     const candles = await this.ex.fetchOHLCV(this.market, this.timeframe, undefined, 2)
     this.lastCandle = candles[0]
+    this.volumeAccumulator = candles[5]
     // generate candles as new price data comes in
     this.input.on('price', this.priceHandler)
   }
