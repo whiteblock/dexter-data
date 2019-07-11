@@ -22,7 +22,7 @@ static_resources:
               routes:
               - match: { prefix: "/" }
                 route:
-                  cluster: greeter_service
+                  cluster: data_service
                   max_grpc_timeout: 0s
               cors:
                 allow_origin:
