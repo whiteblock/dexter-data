@@ -3,6 +3,10 @@ import Link from 'next/link'
 import Head from '../components/head'
 import Nav from '../components/nav'
 
+import * as grpcWeb from 'grpc-web'
+import {DataServiceClient} from '../lib/data_grpc_web_pb'
+import {Candle, CandlesRequest, CandlesResponse, ExchangesRequest, ExchangesResponse, MarketsRequest, MarketsResponse} from '../lib/data_pb'
+
 const Home = () => (
   <div>
     <Head title="Home" />
