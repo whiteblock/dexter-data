@@ -7,7 +7,8 @@ RUN apk add --no-cache \
     gcc \
     g++ \
     make \
-    python
+    python \
+    ca-certificates
 
 # app dependency phase
 COPY package.json yarn.lock ./
