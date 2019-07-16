@@ -24,24 +24,37 @@ function unsupported(call: any, cb: any) {
   cb(GrpcBoom.unimplemented("This method has not been implemented yet"))
 }
 
+/**
+ * @param call
+ * @return metadata
+ */
+function copyMetadata(call: any) {
+  var metadata = call.metadata.getMap();
+  var response_metadata = new grpc.Metadata();
+  for (var key in metadata) {
+    response_metadata.set(key, metadata[key]);
+  }
+  return response_metadata;
+}
+
 function supportedExchanges(call: any, cb: any) {
   logger.info({ method: 'SupportedExchanges' });
   const exchanges = dexterData.supportedExchanges();
-  cb(null, { exchanges });
+  cb(null, { exchanges }, copyMetadata(call));
 }
 
 async function supportedMarkets(call: any, cb: any) {
   const {exchange} = call.request;
   logger.info({ method: 'SupportedMarkets', exchange });
   const markets = await dexterData.supportedMarkets(exchange);
-  cb(null, { markets });
+  cb(null, { markets }, copyMetadata(call));
 }
 
 async function getCandles(call: any, cb: any) {
   const {exchange, market, timeframe, since, limit} = call.request;
   logger.info({ method: 'GetCandles', exchange, market, timeframe, since, limit });
   const candles = await dexterData.getCandles(exchange, market, timeframe, since, limit);
-  cb(null, { candles: candles.map((c:any) => { return { timestamp: c[0], o: c[1], h: c[2], l: c[3], c: c[4], v: c[5] }}) })
+  cb(null, { candles: candles.map((c:any) => { return { timestamp: c[0], o: c[1], h: c[2], l: c[3], c: c[4], v: c[5] }}) }, copyMetadata(call))
 }
 
 async function streamCandles(call: any) {
