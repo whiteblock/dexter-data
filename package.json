@@ -2,6 +2,7 @@
   "dependencies": {
     "@channel/channel": "^1.0.0",
     "@grpc/proto-loader": "^0.5.1",
+    "@types/lazy.js": "^0.5.0",
     "bignumber.js": "^9.0.0",
     "bluebird": "^3.5.5",
     "bookshelf": "^0.14.2",

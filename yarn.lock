@@ -159,6 +159,11 @@
   dependencies:
     knex "*"
 
+"@types/lazy.js@^0.5.0":
+  version "0.5.0"
+  resolved "https://registry.yarnpkg.com/@types/lazy.js/-/lazy.js-0.5.0.tgz#27e06739653641ee1a0aa03eba3659938bfa1873"
+  integrity sha512-B8Ei+JvFWVdEkqysvx+7DWoc0M1EvOF0yV9g3HDGYwssJiKPLkvqH9JXN5Z79sFC0Q11bwMDaOMgGqhS4+Kfhw==
+
 "@types/lodash@*":
   version "4.14.134"
   resolved "https://registry.yarnpkg.com/@types/lodash/-/lodash-4.14.134.tgz#9032b440122db3a2a56200e91191996161dde5b9"
