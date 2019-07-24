@@ -106,16 +106,16 @@ class CandleEmitter {
   priceHandler: any // TODO - replace with a function type
 
   constructor(opts: CandleEmitterOptions) {
-    this.lastCandle = []
-    this.exchange = opts.exchange
-    this.market = opts.market
-    this.timeframe = opts.timeframe
-    this.closeOnly = opts.closeOnly
-    this.ex = new ccxt[opts.exchange]()
+    this.lastCandle        = []
+    this.exchange          = opts.exchange
+    this.market            = opts.market
+    this.timeframe         = opts.timeframe
+    this.closeOnly         = opts.closeOnly
+    this.ex                = new ccxt[opts.exchange]()
     this.volumeAccumulator = 0
-    this.output = new EventEmitter()
-    this.input = new EventEmitter()
-    this.priceHandler = this.emitCandles.bind(this)
+    this.output            = new EventEmitter()
+    this.input             = new EventEmitter()
+    this.priceHandler      = this.emitCandles.bind(this)
   }
 
   /**
@@ -154,7 +154,7 @@ class CandleEmitter {
     const newCandle = [...lastCandle];
     if (lastCandle.length === 0) {
       newCandle[1] = newCandle[2] = newCandle[3] = newCandle[4] = close;
-      newCandle[0] = time.timestampForInterval(this.timeframe, candle[0]);
+      newCandle[0] = time.timestampForTimeframe(this.timeframe, candle[0]);
       return newCandle;
     }
     if (newCandle[2] < close) {
@@ -181,7 +181,7 @@ class CandleEmitter {
     } else if (candles.length === 1) {
       // only one candle available.  brand new market?
       this.lastCandle = candles[0]
-      this.lastCandle[0] = time.timestampForInterval(this.timeframe, candles[0][0]);
+      this.lastCandle[0] = time.timestampForTimeframe(this.timeframe, candles[0][0]);
       this.output.emit('candle', this.lastCandle);
       return
     } else if (candles.length === 2) {
@@ -189,7 +189,7 @@ class CandleEmitter {
       const c0 = candles[0];
       const c1 = candles[1];
       const c1ts = time.dt(c1[0]);
-      if (time.isIntervalBoundary(this.timeframe, c1ts)) {
+      if (time.isTimeframeBoundary(this.timeframe, c1ts)) {
         if (this.lastCandle[4] != c0[4]) {
           const finishCandle = this.updateCandle(this.lastCandle, c0);
           this.output.emit('candle', finishCandle);

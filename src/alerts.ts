@@ -16,9 +16,9 @@ const packageDefinition = protoLoader.loadSync(
 const protoDescriptor = grpc.loadPackageDefinition(packageDefinition);
 
 function getClient(bind: string) {
-  return new protoDescriptor.dexter.Alerts(bind, grpc.credentials.createInsecure());
+  return new (protoDescriptor.dexter as any).Alerts(bind, grpc.credentials.createInsecure());
 }
 
 export default {
-  getClient
-}
+  getClient,
+};

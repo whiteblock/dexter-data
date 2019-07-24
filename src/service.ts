@@ -29,12 +29,12 @@ function unsupported(call: any, cb: any) {
  * @return metadata
  */
 function copyMetadata(call: any) {
-  var metadata = call.metadata.getMap();
-  var response_metadata = new grpc.Metadata();
-  for (var key in metadata) {
-    response_metadata.set(key, metadata[key]);
+  const metadata = call.metadata.getMap();
+  const responseMetadata = new grpc.Metadata();
+  for (const key in metadata) {
+    responseMetadata.set(key, metadata[key]);
   }
-  return response_metadata;
+  return responseMetadata;
 }
 
 function supportedExchanges(call: any, cb: any) {
@@ -81,7 +81,7 @@ async function streamCandles(call: any) {
 
 function getServer() {
   const server = new grpc.Server();
-  const dd: any = protoDescriptor.dexter.Data;
+  const dd: any = (protoDescriptor.dexter as any).Data;
   const service = dd.service;
   server.addService(service, {
     supportedExchanges,
@@ -101,7 +101,7 @@ function startServer(bind: string) {
 }
 
 function getClient(bind: string) {
-  return new protoDescriptor.dexter.Data(bind, grpc.credentials.createInsecure());
+  return new (protoDescriptor.dexter as any).Data(bind, grpc.credentials.createInsecure());
 }
 
 export default {

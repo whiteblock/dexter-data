@@ -10,18 +10,18 @@ function dt(ms: number): DateTime {
 }
 
 /**
- * Return true if the given `time` is on an interval boundary.
+ * Return true if the given `time` is on an timeframe boundary.
  *
- * @param interval  InfluxDB duration notation, eg. 1m, 5m, 1d
- * @param time      A time
- * @returns         `true` if the timestamp is on an interval boundary.`
+ * @param timeframe  InfluxDB duration notation, eg. 1m, 5m, 1d
+ * @param time       A time
+ * @returns          `true` if the timestamp is on an timeframe boundary.`
  */
-function isIntervalBoundary(
-  interval: string,
+function isTimeframeBoundary(
+  timeframe: string,
   time: DateTime,
   now: DateTime = DateTime.utc()) : boolean {
 
-  const match  = interval.match(/(\d+)(\w+)/);
+  const match  = timeframe.match(/(\d+)(\w+)/);
   if (!match) {
     return false;
   }
@@ -46,21 +46,21 @@ function isIntervalBoundary(
 }
 
 /**
- * Convert an interval into milliseconds.
- * @param   interval  A duration in InfluxDB notation
- * @returns           The duration of the interval in milliseconds
+ * Convert an timeframe into milliseconds.
+ * @param   timeframe  A duration in InfluxDB notation
+ * @returns            The duration of the timeframe in milliseconds
  */
-function intervalToMilliseconds(interval: string): number {
-  const match  = interval.match(/(\d+)(\w+)/);
+function timeframeToMilliseconds(timeframe: string): number {
+  const match  = timeframe.match(/(\d+)(\w+)/);
   if (!match) {
-    throw new Error(`Invalid interval: '${interval}'`);
+    throw new Error(`Invalid timeframe: '${timeframe}'`);
   }
   const nu = match[1];
   const unit = match[2];
   const n = Math.min(parseInt(nu, 10));
   // const now = DateTime.local();
   // const dayOfYear = Math.floor(
-  //   Interval.fromDateTimes(DateTime.local(now.year, 1, 1), now).length() + 1);
+  //   Timeframe.fromDateTimes(DateTime.local(now.year, 1, 1), now).length() + 1);
   switch (unit) {
     case 'm':
       return 1000 * 60 * n;
@@ -69,24 +69,27 @@ function intervalToMilliseconds(interval: string): number {
     case 'd':
       return 1000 * 60 * 60 * 24 * n;
   }
-  throw new Error(`Unsupported interval: '${interval}'`);
+  throw new Error(`Unsupported timeframe: '${timeframe}'`);
 }
 
 /**
- * Given an interval and a timestamp, adjust the timestamp so that it fits inside the interval.
- * @param interval A duration in InfluxDB notation
- * @param ms       A timestamp in milliseconds
- * @returns        An adjusted timestamp in milliseconds that fits inside `interval`
+ * Given an timeframe and a timestamp, adjust the timestamp so that it fits inside the timeframe.
+ * @param timeframe A duration in InfluxDB notation
+ * @param ms        A timestamp in milliseconds
+ * @returns         An adjusted timestamp in milliseconds that fits inside `timeframe`
  */
-function timestampForInterval(interval: string, ms: number): number {
-  const ints = intervalToMilliseconds(interval);
+function timestampForTimeframe(timeframe: string, ms: number): number {
+  const ints = timeframeToMilliseconds(timeframe);
   const diff = ms % ints;
   return ms - diff;
 }
 
+function highestCommonTimeframe(nativeTimeframes: Array<string>, timeframe: string) {
+}
+
 export default {
   dt,
-  isIntervalBoundary,
-  intervalToMilliseconds,
-  timestampForInterval,
+  isTimeframeBoundary,
+  timeframeToMilliseconds,
+  timestampForTimeframe,
 };
