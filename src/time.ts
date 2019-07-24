@@ -46,11 +46,11 @@ function isTimeframeBoundary(
 }
 
 /**
- * Convert an timeframe into milliseconds.
+ * Convert an timeframe into minutes.
  * @param   timeframe  A duration in InfluxDB notation
  * @returns            The duration of the timeframe in milliseconds
  */
-function timeframeToMilliseconds(timeframe: string): number {
+function timeframeToMinutes(timeframe: string): number {
   const match  = timeframe.match(/(\d+)(\w+)/);
   if (!match) {
     throw new Error(`Invalid timeframe: '${timeframe}'`);
@@ -63,11 +63,11 @@ function timeframeToMilliseconds(timeframe: string): number {
   //   Timeframe.fromDateTimes(DateTime.local(now.year, 1, 1), now).length() + 1);
   switch (unit) {
     case 'm':
-      return 1000 * 60 * n;
+      return n;
     case 'h':
-      return 1000 * 60 * 60 * n;
+      return 60 * n;
     case 'd':
-      return 1000 * 60 * 60 * 24 * n;
+      return 24 * 60 * n;
   }
   throw new Error(`Unsupported timeframe: '${timeframe}'`);
 }
@@ -79,17 +79,46 @@ function timeframeToMilliseconds(timeframe: string): number {
  * @returns         An adjusted timestamp in milliseconds that fits inside `timeframe`
  */
 function timestampForTimeframe(timeframe: string, ms: number): number {
-  const ints = timeframeToMilliseconds(timeframe);
+  const ints = timeframeToMinutes(timeframe) * 60 * 1000;
   const diff = ms % ints;
   return ms - diff;
 }
 
-function highestCommonTimeframe(nativeTimeframes: Array<string>, timeframe: string) {
+/**
+ * Normalize a list of timeframes to minutes 
+ * @param timeframes An array of timeframes supported by an exchange
+ * @returns          A list of minutes
+ */
+function minutesFromTimeframes(timeframes: Array<string>): Array<number> {
+  return timeframes.map(timeframeToMinutes);
+}
+
+
+/**
+ * Return the highest native timeframe that is evenly divisible into the given timeframe.
+ * @param nativeTimeframes An array of timeframes supported by an exchange.
+ * @param timeframe        The timeframe we want to emulate later
+ * @returns                The highest common timeframe
+ */
+function highestCommonTimeframe(nativeTimeframes: Array<string>, timeframe: string): number {
+  const minutes = minutesFromTimeframes(nativeTimeframes).sort((a, b) => b - a);
+  const base = timeframeToMinutes(timeframe);
+  // console.log({ minutes });
+  const common = minutes.find((t) => {
+    // console.log(`base(${base}) % t(${t}) == ${ base % 5 }`);
+    return (base % t) === 0;
+  });
+  if (common) {
+    return common;
+  }
+  throw(new Error(`Common timeframe not found for ${timeframe}`));
 }
 
 export default {
   dt,
   isTimeframeBoundary,
-  timeframeToMilliseconds,
+  timeframeToMinutes,
   timestampForTimeframe,
+  minutesFromTimeframes,
+  highestCommonTimeframe,
 };
