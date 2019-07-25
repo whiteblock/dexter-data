@@ -85,12 +85,29 @@ function timestampForTimeframe(timeframe: string, ms: number): number {
 }
 
 /**
- * Normalize a list of timeframes to minutes 
+ * Normalize a list of timeframes to minutes
  * @param timeframes An array of timeframes supported by an exchange
  * @returns          A list of minutes
  */
 function minutesFromTimeframes(timeframes: Array<string>): Array<number> {
   return timeframes.map(timeframeToMinutes);
+}
+
+/**
+ * Translate raw minutes back to timeframe notation
+ * @param timeframes An array of timeframes supported by an exchange
+ * @returns          A hashmap with raw minutes as keys and timeframes as values
+ */
+function reverseMapMinutesToTimeframes(timeframes: Array<string>): { [minutes: number]: string } {
+  return timeframes.reduce((m: { [minutes: number]: string }, a) => {
+    try {
+      const minutes = timeframeToMinutes(a);
+      m[minutes] = a;
+      return m;
+    } catch {
+      return m;
+    }
+  }, {});
 }
 
 
@@ -114,11 +131,23 @@ function highestCommonTimeframe(nativeTimeframes: Array<string>, timeframe: stri
   throw(new Error(`Common timeframe not found for ${timeframe}`));
 }
 
+function emulateTimeframeCandles(timeframe: string, commonTimeframe: string, candles: any): any {
+  const a = timeframeToMinutes(timeframe);
+  const b = timeframeToMinutes(commonTimeframe);
+  const factor = a / b;
+  const emulatedCandles: any = [];
+  for (let i = 0; i < candles.length; i += 1) {
+  }
+  return emulatedCandles;
+}
+
 export default {
   dt,
   isTimeframeBoundary,
   timeframeToMinutes,
   timestampForTimeframe,
   minutesFromTimeframes,
+  reverseMapMinutesToTimeframes,
   highestCommonTimeframe,
+  emulateTimeframeCandles,
 };

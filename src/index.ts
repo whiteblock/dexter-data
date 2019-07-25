@@ -242,16 +242,38 @@ async function supportedMarkets(exchange: string): Promise<Array<string>> {
 async function getCandles(exchange: string, market: string, timeframe: string, since: string, limit: number) {
   const ex: any = new ccxt[exchange]();
   const args: Array<any> = [ market, timeframe ];
-  if (since) {
-    args.push(ex.parse8601(since))
+  if (ex.timeframes.includes(timeframe)) {
+    // Timeframe is natively supported by the exchange
+    if (since) {
+      args.push(ex.parse8601(since))
+    } else {
+      args.push(undefined)
+    }
+    if (limit > 0) {
+      args.push(Number(limit))
+    }
+    const candles: Array<Object> = await ex.fetchOHLCV(...args);
+    return candles
   } else {
-    args.push(undefined)
+    // If the timeframe is not natively supported by the exchange, try to emulate it.
+    const nativeTimeframes = Object.keys(ex.timeframes);
+    const reverseMap       = time.reverseMapMinutesToTimeframes(nativeTimeframes);
+    const commonMinutes    = time.highestCommonTimeframe(nativeTimeframes, timeframe);
+    const commonTimeframe  = reverseMap[commonMinutes]
+    if (commonTimeframe) {
+      args[1] = commonTimeframe
+      if (since) {
+        args.push(ex.parse8601(since))
+      } else {
+        args.push(undefined)
+      }
+      if (limit > 0) {
+        args.push(Number(limit))
+      }
+      const candles: Array<Object> = await ex.fetchOHLCV(...args);
+      return time.emulateTimeframeCandles(timeframe, commonTimeframe, candles)
+    }
   }
-  if (limit > 0) {
-    args.push(Number(limit))
-  }
-  const candles: Array<Object> = await ex.fetchOHLCV(...args);
-  return candles
 }
 
 // PriceEmitter -[1m candles every interval]-> CandleAggregator -[new candle for given timeframe]-> 
