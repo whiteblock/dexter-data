@@ -18,8 +18,7 @@ function dt(ms: number): DateTime {
  */
 function isTimeframeBoundary(
   timeframe: string,
-  time: DateTime,
-  now: DateTime = DateTime.utc()) : boolean {
+  time: DateTime) : boolean {
 
   const match  = timeframe.match(/(\d+)(\w+)/);
   if (!match) {
@@ -29,7 +28,7 @@ function isTimeframeBoundary(
   const unit = match[2];
   const n = Math.min(parseInt(nu, 10));
   const dayOfYear = Math.floor(
-    Interval.fromDateTimes(DateTime.utc(now.year, 1, 1), now).length() + 1);
+    Interval.fromDateTimes(DateTime.utc(time.year, 1, 1), time).length() + 1);
 
   switch (unit) {
     case 'm':
@@ -131,14 +130,48 @@ function highestCommonTimeframe(nativeTimeframes: Array<string>, timeframe: stri
   throw(new Error(`Common timeframe not found for ${timeframe}`));
 }
 
-function emulateTimeframeCandles(timeframe: string, commonTimeframe: string, candles: any): any {
-  const a = timeframeToMinutes(timeframe);
-  const b = timeframeToMinutes(commonTimeframe);
-  const factor = a / b;
+/**
+ * Aggregate candles into an arbitrary timeframe
+ * @param timeframe   The desired timeframe
+ * @param candles     An array of candles in a timeframe that's smaller and even divisible into `timeframe`
+ * @returns           An array of candles aggregated into `timeframe`
+ */
+function emulateTimeframeCandles(timeframe: string, candles: any): any {
   const emulatedCandles: any = [];
-  for (let i = 0; i < candles.length; i += 1) {
-  }
+  candles.reduce((m, c) => {
+    // if m is empty, set the right timestamp on c and let it be the first candle in m.
+    if (m.length === 0) {
+      c[0] = timestampForTimeframe(timeframe, c[0])
+      m.push(c)
+    } else {
+      if (isTimeframeBoundary(timeframe, c[0])) {
+        // if candle c is on a timeframe boundary, start a new candle and push it on to m.
+        m.push(c)
+      } else {
+        // else merge c into last candle.
+        const lastCandle = m[m.length - 1]
+        const newCandle = mergeCandle(lastCandle, c)
+        m[m.length - 1] = newCandle
+      }
+    }
+    return m
+  }, emulatedCandles)
   return emulatedCandles;
+}
+
+function mergeCandle(lastCandle: Array<number>, candle: Array<number>): Array<number> {
+  const close = candle[4];
+  const newCandle = [...lastCandle]
+  if (newCandle[2] < close) {
+    newCandle[2] = close
+  }
+  if (newCandle[3] > close) {
+    newCandle[3] = close
+  }
+  newCandle[4] = close;
+  const newVolume = lastCandle[5] + newCandle[5]
+  newCandle[5] = newVolume
+  return newCandle
 }
 
 export default {
