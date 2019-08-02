@@ -164,8 +164,9 @@ class CandleEmitter {
       newCandle[3] = close
     }
     newCandle[4] = close;
-    //newCandle[5] = ? // TODO - Learn how volume is calculated so I can aggregate it myself.
-    return newCandle;
+    const newVolume = lastCandle[5] + newCandle[5]
+    newCandle[5] = newVolume
+    return newCandle
   }
 
   /**
