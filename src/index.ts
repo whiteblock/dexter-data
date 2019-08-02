@@ -272,7 +272,7 @@ async function getCandles(exchange: string, market: string, timeframe: string, s
         args.push(Number(limit))
       }
       const candles: Array<Object> = await ex.fetchOHLCV(...args);
-      return time.emulateTimeframeCandles(timeframe, commonTimeframe, candles)
+      return time.emulateTimeframeCandles(timeframe, candles)
     }
   }
 }

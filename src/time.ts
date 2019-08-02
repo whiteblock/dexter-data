@@ -138,40 +138,40 @@ function highestCommonTimeframe(nativeTimeframes: Array<string>, timeframe: stri
  */
 function emulateTimeframeCandles(timeframe: string, candles: any): any {
   const emulatedCandles: any = [];
-  candles.reduce((m, c) => {
+  candles.reduce((m: any, c: any) => {
     // if m is empty, set the right timestamp on c and let it be the first candle in m.
     if (m.length === 0) {
-      c[0] = timestampForTimeframe(timeframe, c[0])
-      m.push(c)
+      c[0] = timestampForTimeframe(timeframe, c[0]);
+      m.push(c);
     } else {
       if (isTimeframeBoundary(timeframe, c[0])) {
         // if candle c is on a timeframe boundary, start a new candle and push it on to m.
-        m.push(c)
+        m.push(c);
       } else {
         // else merge c into last candle.
-        const lastCandle = m[m.length - 1]
-        const newCandle = mergeCandle(lastCandle, c)
-        m[m.length - 1] = newCandle
+        const lastCandle = m[m.length - 1];
+        const newCandle = mergeCandle(lastCandle, c);
+        m[m.length - 1] = newCandle;
       }
     }
     return m
-  }, emulatedCandles)
+  }, emulatedCandles);
   return emulatedCandles;
 }
 
 function mergeCandle(lastCandle: Array<number>, candle: Array<number>): Array<number> {
   const close = candle[4];
-  const newCandle = [...lastCandle]
+  const newCandle = [...lastCandle];
   if (newCandle[2] < close) {
-    newCandle[2] = close
+    newCandle[2] = close;
   }
   if (newCandle[3] > close) {
-    newCandle[3] = close
+    newCandle[3] = close;
   }
   newCandle[4] = close;
-  const newVolume = lastCandle[5] + newCandle[5]
-  newCandle[5] = newVolume
-  return newCandle
+  const newVolume = lastCandle[5] + newCandle[5];
+  newCandle[5] = newVolume;
+  return newCandle;
 }
 
 export default {
