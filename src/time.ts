@@ -183,4 +183,5 @@ export default {
   reverseMapMinutesToTimeframes,
   highestCommonTimeframe,
   emulateTimeframeCandles,
+  mergeCandle,
 };
