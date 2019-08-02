@@ -10,5 +10,4 @@ program
   .option('-v, --verbose', 'Be verbose')
   .parse(process.argv)
 
-console.log("test");
 service.startServer(program.bind)
