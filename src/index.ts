@@ -1,7 +1,4 @@
 import _ccxt from 'ccxt';
-//import Bookshelf from 'bookshelf';
-//import Knex from 'knex';
-import Lazy from 'lazy.js';
 import { EventEmitter } from 'events';
 import pino from 'pino';
 import time from './time';
@@ -213,7 +210,7 @@ class CandleEmitter {
  * @returns A list of exchanges we support.
  */
 function supportedExchanges(): Array<string> {
-  return Lazy(ccxt.exchanges)
+  return ccxt.exchanges
     .map((name: string) => new ccxt[name]())
     .filter((ex: any) => ex.has['fetchOHLCV'])
     .map((ex: any) => ex.id)
