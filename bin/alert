@@ -29,7 +29,7 @@ program
     console.log(`add alert from file ${alert}`)
     const client = connect(defaultBind)
     const a = require(alert)
-    client.addAlert(a, console.log)
+    client.createAlert(a, console.log)
   })
 
 program
