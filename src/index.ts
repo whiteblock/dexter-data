@@ -240,7 +240,8 @@ async function supportedMarkets(exchange: string): Promise<Array<string>> {
 async function getCandles(exchange: string, market: string, timeframe: string, since: string, limit: number) {
   const ex: any = new ccxt[exchange]();
   const args: Array<any> = [ market, timeframe ];
-  if (ex.timeframes.includes(timeframe)) {
+  const timeframes: Array<string> = Object.keys(ex.timeframes)
+  if (timeframes.includes(timeframe)) {
     // Timeframe is natively supported by the exchange
     if (since) {
       args.push(ex.parse8601(since))
