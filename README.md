@@ -1,17 +1,3 @@
-# dexter-data
+# DEPRECATED
 
-A gRPC service for streaming market data. 
-
-## Install
-
-npm install Whiteblock/dexter-data
-
-## Usage
-
-Run the gRPC server
-
-```sh
-export BIND=0.0.0.0:50051
-dexter-data
-```
-.
+This repository has been deprecated and its contents have been moved in to [whiteblock/dexter](/whiteblock/dexter) which is now a mono-repo containing multiple projects.
